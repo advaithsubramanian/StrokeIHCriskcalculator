@@ -1,0 +1,3 @@
+South Asian-origin adults face substantially elevated cardiovascular and cerebrovascular disease risk that is not captured by widely used risk-prediction tools such as the American College of Cardiology/American Heart Association Pooled Cohort Equations (PCE). This is because they were derived exclusively from White and Black cohorts. 
+So, I spent some time sifting through existing data on South Asian cohorts to create this calculator that, based on previous literature, corrects the PCE to calculate stroke risk for South Asians in a more accurate way. 
+I used Claude Code to help develop this and played around with all the features on it. While this is just a research prototype I think it's a cool start to using AI to improve neuro and cardio care for South Asians 
