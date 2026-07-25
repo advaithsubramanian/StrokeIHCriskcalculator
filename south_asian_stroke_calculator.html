@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stroke and ICH Risk Tool for South Asians</title>
+<style>
+  :root{
+    --navy:#1F4E78; --navy-dark:#163a58; --green:#E2F0D9; --green-text:#2f5a1f;
+    --flag:#FFF2CC; --flag-text:#7a5c00; --red:#FCE4E4; --red-text:#8a1f1f; --req:#c0392b;
+    --orange:#FBE4C8; --orange-text:#8a4b00;
+    --conf-bg:#e7ecf1; --conf-text:#3d4b58;
+    --border:#d8dde3; --text:#26313d; --muted:#5c6b78; --bg:#f6f8fa;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px;}
+  .wrap{max-width:920px;margin:0 auto;}
+  h1{font-size:22px;color:var(--navy-dark);margin-bottom:6px;}
+  .subtitle{color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.6;}
+  .disclaimer{background:var(--flag);color:var(--flag-text);border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.6;margin-bottom:22px;}
+  .intro{background:#eef3f9;border:1px solid #c9d8e8;border-radius:8px;padding:16px 18px;font-size:13.5px;line-height:1.65;margin-bottom:22px;color:var(--text);}
+  .intro p{margin:0 0 10px 0;}
+  .intro p:last-child{margin-bottom:0;}
+  .intro strong{color:var(--navy-dark);}
+  .intro a{color:var(--navy);text-decoration:none;border-bottom:1px solid #9db8d1;}
+  .intro a:hover{color:var(--navy-dark);}
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px;}
+  .card h2{font-size:15px;color:var(--navy-dark);margin:0 0 14px 0;text-transform:uppercase;letter-spacing:0.03em;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+  label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  .req{color:var(--req);font-weight:700;}
+  .hint{font-size:11px;color:#8a97a3;margin-top:3px;line-height:1.4;}
+  input[type=number],select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:#fff;}
+  .check-header{font-size:12.5px;color:var(--muted);font-weight:600;margin:14px 0 4px 0;}
+  .checkrow{display:flex;align-items:center;gap:8px;padding:8px 0;}
+  .checkrow input{width:16px;height:16px;flex-shrink:0;}
+  .checkrow label{margin:0;font-weight:500;color:var(--text);font-size:13.5px;}
+  button{background:var(--navy);color:#fff;border:none;border-radius:7px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;}
+  button:hover{background:var(--navy-dark);}
+  .results{display:none;}
+  .result-block{border-radius:8px;padding:18px 20px;margin-bottom:16px;}
+  .result-block.a{background:var(--green);}
+  .result-block.b{background:#eef3f9;border:1px solid #c9d8e8;}
+  .result-block h3{margin:0 0 4px 0;font-size:15px;color:var(--navy-dark);line-height:1.4;}
+  .result-block .what-is-this{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;}
+  .headline{font-size:14px;line-height:1.6;background:rgba(255,255,255,0.6);border-radius:6px;padding:12px 14px;margin-bottom:12px;}
+  .headline .big{font-size:24px;font-weight:800;color:var(--navy-dark);}
+  .headline .small{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.02em;}
+  .recal-line{font-size:17px;font-weight:700;color:var(--navy-dark);margin-top:12px;padding-top:12px;border-top:1px dashed #c3d3c0;}
+  .subtype-box{background:rgba(255,255,255,0.6);border-radius:6px;padding:12px 14px;margin-bottom:10px;}
+  .subtype-box h4{margin:0 0 6px 0;font-size:13.5px;color:var(--navy-dark);}
+  .subtype-box .headline-num{font-size:24px;font-weight:800;color:var(--navy-dark);}
+  .subtype-box .compare-line{font-size:12.5px;color:var(--text);margin-top:4px;line-height:1.5;}
+  .flag-box{background:var(--red);color:var(--red-text);border-radius:6px;padding:10px 12px;font-size:12px;margin-top:8px;line-height:1.5;}
+  .ok-box{background:transparent;color:var(--muted);font-size:12px;margin-top:6px;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:0.01em;white-space:nowrap;}
+  .badge.cat-low{background:var(--green);color:var(--green-text);}
+  .badge.cat-borderline{background:var(--flag);color:var(--flag-text);}
+  .badge.cat-intermediate{background:var(--orange);color:var(--orange-text);}
+  .badge.cat-high{background:var(--red);color:var(--red-text);}
+  .badge.conf{background:var(--conf-bg);color:var(--conf-text);font-weight:600;}
+  .badge.conf.low{background:#f3e2cf;color:#7a4a00;}
+  .delta-line{font-size:13px;color:var(--text);margin-top:8px;padding-top:8px;border-top:1px dashed #c3d3c0;}
+  .delta-line .delta-num{font-weight:700;color:var(--navy-dark);}
+  .why-box{background:#fff;border-left:4px solid var(--navy);border-radius:6px;padding:12px 16px;font-size:13px;line-height:1.6;margin-bottom:22px;color:var(--text);}
+  .why-box strong{color:var(--navy-dark);}
+  .conf-note{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5;}
+  .methodology{font-size:12.5px;color:var(--muted);line-height:1.65;margin-top:10px;}
+  .methodology summary{cursor:pointer;color:var(--navy);font-weight:600;font-size:13px;}
+  .methodology a{color:var(--navy);}
+  .methodology ol{margin:8px 0;padding-left:20px;}
+  .methodology li{margin-bottom:8px;}
+  .glossary{margin-top:8px;}
+  .glossary dt{font-weight:700;color:var(--navy-dark);margin-top:8px;font-size:13px;}
+  .glossary dd{margin:2px 0 0 0;font-size:12.5px;color:var(--text);}
+  footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Stroke and ICH Risk Tool for South Asians</h1>
+  <div class="subtitle">A research prototype aimed at serving adults of the South Asian diaspora, adults of South Asian ancestry residing in the US, UK, or Canada.</div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This is a research prototype, not a validated clinical instrument. This tool is derived from published epidemiological studies rather than prospective clinical validation, and has not undergone formal regulatory review. It is intended for investigative and educational use and should not be used to guide clinical decision-making.
+  </div>
+
+  <div class="intro">
+    <p>
+      Standard cardiovascular risk equations, such as the Pooled Cohort Equations (PCE) used in current ACC/AHA
+      guidelines, are derived predominantly from White and Black American cohorts. Multiple South Asian cohort
+      studies have found that these equations underestimate observed 10-year event rates in this population
+      (<a href="https://doi.org/10.1186/s12872-022-02993-z" target="_blank" rel="noopener">Pursnani et al. 2022 ↗</a>;
+      <a href="https://doi.org/10.1161/CIRCULATIONAHA.120.052430" target="_blank" rel="noopener">Patel et al. 2021 ↗</a>).
+    </p>
+    <p>
+      South Asians have also been shown to present with earlier-onset atherosclerotic disease at lower BMI and
+      cholesterol thresholds than Western reference populations
+      (<a href="https://doi.org/10.1161/CIR.0000000000000580" target="_blank" rel="noopener">Volgman et al. 2018 ↗</a>).
+    </p>
+    <p>
+      This tool applies a South Asian-specific recalibration to the standard formula and, separately, a
+      stroke-subtype-specific relative-risk model derived from INTERSTROKE and Canadian population cohort data.
+    </p>
+    <p>
+      From this tool, two outputs are produced: a general cardiovascular risk estimate and a stroke-subtype-stratified
+      estimate (ischemic vs. hemorrhagic). A summarized methodology is available under each result.
+    </p>
+  </div>
+
+  <div class="why-box">
+    <strong>Why this matters:</strong> this tool demonstrates how a risk estimate changes when South Asian-specific
+    data replace a default reference population. Each result below shows the standard estimate next to the
+    recalibrated one, so the difference is visible directly rather than reported only in the paper. It is built to
+    illustrate that gap, not to guide an individual treatment decision.
+  </div>
+
+  <div class="card">
+    <h2>Patient Information</h2>
+    <div class="grid">
+      <div>
+        <label>Biological sex <span class="req">*</span></label>
+        <select id="sex">
+          <option value="" disabled selected>Please select</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div>
+        <label>Age (years) <span class="req">*</span></label>
+        <input type="number" id="age" placeholder="e.g., 55" min="20" max="90">
+      </div>
+      <div>
+        <label>Country of family origin <span class="req">*</span></label>
+        <select id="country">
+          <option value="" disabled selected>Please select</option>
+          <option value="pooled">Unspecified / South Asian, unspecified origin</option>
+          <option value="indian">India</option>
+          <option value="pakistani">Pakistan</option>
+          <option value="bangladeshi">Bangladesh</option>
+          <option value="other_south_asian">Other (Sri Lanka, Nepal, Bhutan, etc.)</option>
+        </select>
+      </div>
+      <div>
+        <label>Total cholesterol (mg/dL) <span class="req">*</span></label>
+        <input type="number" id="totchol" placeholder="e.g., 213">
+      </div>
+      <div>
+        <label>HDL cholesterol (mg/dL) <span class="req">*</span></label>
+        <input type="number" id="hdl" placeholder="e.g., 50">
+      </div>
+      <div>
+        <label>Systolic blood pressure (mmHg) <span class="req">*</span></label>
+        <input type="number" id="sbp" placeholder="e.g., 130">
+      </div>
+      <div>
+        <label>Waist-to-hip ratio (WHR) <span class="req">*</span></label>
+        <select id="whr">
+          <option value="" disabled selected>Please select</option>
+          <option value="0">Normal</option>
+          <option value="1">Elevated</option>
+        </select>
+        <div class="hint">Elevated defined as WHR ≥0.90 (male) or ≥0.85 (female), per WHO central adiposity thresholds.</div>
+      </div>
+    </div>
+
+    <div class="check-header">Please check the following if applicable:</div>
+    <div class="grid">
+      <div class="checkrow"><input type="checkbox" id="bp_treated"><label for="bp_treated">Currently on antihypertensive medication</label></div>
+      <div class="checkrow"><input type="checkbox" id="smoker"><label for="smoker">Current tobacco use</label></div>
+      <div class="checkrow"><input type="checkbox" id="diabetes"><label for="diabetes">Diagnosed with diabetes</label></div>
+      <div class="checkrow"><input type="checkbox" id="hypertension"><label for="hypertension">Diagnosed with hypertension (independent of treatment status)</label></div>
+    </div>
+    <button onclick="calculate()">Calculate risk</button>
+  </div>
+
+  <div class="results" id="results">
+
+    <div class="result-block a">
+      <h3>1. General Cardiovascular Risk: 10-year composite risk of MI, stroke, or cardiovascular death</h3>
+      <div class="what-is-this">Derived from the ACC/AHA Pooled Cohort Equations (PCE), recalibrated using published South Asian cohort comparisons of predicted vs. observed risk. See Section 2 for stroke-subtype stratification.</div>
+      <div class="headline">
+        <div class="small">PCE-predicted 10-year risk (unadjusted)</div>
+        <div><span class="big" id="pceRaw">–</span></div>
+        <div class="small" style="margin-top:8px;">South Asian-recalibrated 10-year risk</div>
+        <div><span class="big" id="pceAdj">–</span> <span class="badge" id="pceCatBadge"></span></div>
+        <div class="delta-line" id="pceDeltaLine"></div>
+        <div class="recal-line" id="pceMultLine"></div>
+        <div class="badge-row"><span class="badge conf" id="pceConfBadge"></span></div>
+        <div class="conf-note" id="pceConf"></div>
+      </div>
+      <details class="methodology">
+        <summary>Methodology</summary>
+        <div style="margin-top:8px;">
+        Baseline estimate uses the standard ACC/AHA Pooled Cohort Equations (PCE), the 10-year atherosclerotic
+        cardiovascular disease risk calculator incorporated into current US guidelines. The PCE derivation cohorts
+        (ARIC, CHS, CARDIA, Framingham Offspring) did not include South Asian participants, and no South
+        Asian-specific coefficient set exists in the original equations.
+        </div>
+        <div style="margin-top:8px;">
+        Two published predicted-vs-observed comparisons in South Asian cohorts inform the recalibration curve applied
+        here. Pursnani et al. 2022 (Kaiser Permanente) found a PCE-predicted risk of 1.8% against an observed risk of
+        4.9% in a low-predicted-risk stratum. Patel et al. 2021 (UK Biobank) found a predicted risk of 4.8% against
+        an observed risk of 6.8%. These two anchor points define a log-log calibration curve, with the multiplier
+        decreasing as PCE-predicted risk increases. A country-of-origin multiplier (Patel et al. 2021, UK Biobank
+        subgroup hazard ratios) is applied when a specific country of origin is selected.
+        </div>
+        <div style="margin-top:8px;">
+        The recalibration figure above should be interpreted as one estimate consistent with part of the available
+        evidence, not a settled correction factor.
+        </div>
+        <div style="margin-top:8px;">
+        Risk category (Low / Borderline / Intermediate / High) uses the standard ACC/AHA PCE thresholds
+        (&lt;5%, 5&ndash;&lt;7.5%, 7.5&ndash;&lt;20%, &ge;20%), applied to the recalibrated figure.
+        </div>
+      </details>
+    </div>
+
+    <div class="result-block b">
+      <h3>2. Stroke-Specific Risk, Stratified by Subtype</h3>
+      <div class="what-is-this">Ischemic stroke (thromboembolic occlusion) and hemorrhagic stroke (ICH) have distinct risk factor profiles and are therefore modeled separately, rather than combined into a single composite estimate as in Section 1. Derived directly from South Asian and South Asia-region stroke incidence and risk-factor data.</div>
+
+      <div class="subtype-box">
+        <h4>Ischemic stroke <span class="badge" id="ischCatBadge"></span></h4>
+        <div class="headline-num" id="ischRisk">–</div>
+        <div class="compare-line" id="ischCompare"></div>
+        <div class="badge-row"><span class="badge conf" id="ischConfBadge"></span></div>
+        <div class="conf-note" id="ischConf"></div>
+      </div>
+
+      <div class="subtype-box">
+        <h4>Hemorrhagic stroke (ICH) <span class="badge" id="ichCatBadge"></span></h4>
+        <div class="headline-num" id="ichRisk">–</div>
+        <div class="compare-line" id="ichCompare"></div>
+        <div class="badge-row"><span class="badge conf" id="ichConfBadge"></span></div>
+        <div class="conf-note" id="ichConf"></div>
+      </div>
+
+      <details class="methodology">
+        <summary>Methodology</summary>
+        <div style="margin-top:8px;">The estimate combines three components:</div>
+        <ol>
+          <li>A baseline incidence rate for South Asian adults (39.7 ischemic and 5.0 ICH strokes per 100,000
+          person-years; <a href="https://doi.org/10.1371/journal.pone.0175556" target="_blank" rel="noopener">Khan et al. 2017 ↗</a>,
+          Ontario/British Columbia cohort, age- and sex-standardized).</li>
+          <li>An age adjustment reflecting how stroke risk changes with age in South Asian immigrants specifically,
+          rather than a generic aging curve (<a href="https://doi.org/10.1212/WNL.0000000000012555" target="_blank" rel="noopener">Vyas et al. 2021 ↗</a>).</li>
+          <li>A relative-risk multiplier built from the risk factors selected above. Each factor carries a South
+          Asia-region odds ratio from the <a href="https://doi.org/10.1016/S0140-6736(16)30506-2" target="_blank" rel="noopener">INTERSTROKE ↗</a>
+          case-control study, calculated separately for ischemic and hemorrhagic stroke (for example, hypertension
+          carries an odds ratio of 3.61 for ischemic stroke and 4.37 for ICH). Selected risk factors are multiplied
+          together to form a combined relative-risk estimate.</li>
+        </ol>
+        <div style="margin-top:8px;">
+        Note: multiplying odds ratios assumes each risk factor acts independently. With three or more risk factors
+        present, that assumption is less reliable and tends to overstate true combined risk. A flag appears below the
+        affected estimate when this threshold is met; interpret it as an upper-bound estimate.
+        </div>
+        <div style="margin-top:8px;">
+        Note: family history of stroke is an established risk factor, but no South Asian-specific effect estimate was
+        identified in the literature reviewed; it is not included as a model input.
+        </div>
+        <div style="margin-top:8px;">
+        Risk category (Low / Moderate / Elevated) for ischemic stroke and ICH uses descriptive bands
+        (&lt;1%, 1&ndash;&lt;3%, &ge;3%) chosen to make the output legible. Unlike Model A's PCE bands, no
+        validated clinical risk tier exists for South Asian stroke-subtype risk; treat these labels as
+        interpretive, not diagnostic.
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    Derived from published cohort and case-control data (MASALA, UK Biobank, INTERSTROKE, INTERHEART, SABRE, and
+    Canadian population-based studies by Khan et al. and Vyas et al.). No individual patient-level data was used in
+    model construction or testing. Not reviewed or approved for clinical use.
+  </footer>
+</div>
+
+<script>
+const PCE_COEF = {
+  male: {ln_age:12.344, ln_age_sq:0.0, ln_totchol:11.853, ln_age_totchol:-2.664, ln_hdl:-7.990, ln_age_hdl:1.769,
+         ln_treated_sbp:1.797, ln_age_treated_sbp:0.0, ln_untreated_sbp:1.764, ln_age_untreated_sbp:0.0,
+         smoker:7.837, ln_age_smoker:-1.795, diabetes:0.658, group_mean:61.18, baseline_survival:0.9144},
+  female:{ln_age:-29.799, ln_age_sq:4.884, ln_totchol:13.540, ln_age_totchol:-3.114, ln_hdl:-13.578, ln_age_hdl:3.149,
+         ln_treated_sbp:2.019, ln_age_treated_sbp:0.0, ln_untreated_sbp:1.957, ln_age_untreated_sbp:0.0,
+         smoker:7.574, ln_age_smoker:-1.665, diabetes:0.661, group_mean:-29.18, baseline_survival:0.9665}
+};
+
+function pce10yRisk(sex, age, totchol, hdl, sbp, bpTreated, smoker, diabetes){
+  const c = PCE_COEF[sex];
+  const lnAge = Math.log(age), lnTC = Math.log(totchol), lnHDL = Math.log(hdl), lnSBP = Math.log(sbp);
+  const sm = smoker ? 1 : 0, db = diabetes ? 1 : 0;
+  let s = lnAge*c.ln_age + (lnAge**2)*c.ln_age_sq + lnTC*c.ln_totchol + lnAge*lnTC*c.ln_age_totchol
+        + lnHDL*c.ln_hdl + lnAge*lnHDL*c.ln_age_hdl + sm*c.smoker + lnAge*sm*c.ln_age_smoker + db*c.diabetes;
+  if(bpTreated){ s += lnSBP*c.ln_treated_sbp + lnAge*lnSBP*c.ln_age_treated_sbp; }
+  else{ s += lnSBP*c.ln_untreated_sbp + lnAge*lnSBP*c.ln_age_untreated_sbp; }
+  const risk = 1 - Math.pow(c.baseline_survival, Math.exp(s - c.group_mean));
+  return Math.round(risk*100*100)/100;
+}
+
+const CALIB_ANCHORS = [[1.8, 2.72],[4.8, 1.42]];
+function southAsianMultiplier(pcePct){
+  const [loPct, loMult] = CALIB_ANCHORS[0], [hiPct, hiMult] = CALIB_ANCHORS[1];
+  if(pcePct <= loPct) return loMult;
+  if(pcePct >= hiPct) return hiMult;
+  const x = Math.log(pcePct), x0 = Math.log(loPct), x1 = Math.log(hiPct);
+  const y0 = Math.log(loMult), y1 = Math.log(hiMult);
+  const y = y0 + (y1-y0)*(x-x0)/(x1-x0);
+  return Math.exp(y);
+}
+
+const COUNTRY_RATIO = {pooled:1.00, bangladeshi:1.80, pakistani:1.21, other_south_asian:1.19, indian:1.02};
+
+function modelA(sex, age, totchol, hdl, sbp, bpTreated, smoker, diabetes, country){
+  const base = pce10yRisk(sex, age, totchol, hdl, sbp, bpTreated, smoker, diabetes);
+  const baseMult = southAsianMultiplier(base);
+  const mult = baseMult * COUNTRY_RATIO[country];
+  const recal = Math.min(Math.round(base*mult*100)/100, 99.9);
+  return {pceRaw: base, recalibrated: recal, multiplier: mult};
+}
+
+// Standard ACC/AHA PCE risk tiers, applied to the recalibrated figure.
+function ascvdCategory(pct){
+  if(pct < 5) return {label:'Low', cls:'cat-low'};
+  if(pct < 7.5) return {label:'Borderline', cls:'cat-borderline'};
+  if(pct < 20) return {label:'Intermediate', cls:'cat-intermediate'};
+  return {label:'High', cls:'cat-high'};
+}
+
+// Descriptive bands only (see methodology); no validated clinical tier exists
+// for South Asian stroke-subtype risk.
+function strokeCategory(pct){
+  if(pct < 1) return {label:'Low', cls:'cat-low'};
+  if(pct < 3) return {label:'Moderate', cls:'cat-borderline'};
+  return {label:'Elevated', cls:'cat-high'};
+}
+
+// A single, persistently visible confidence label rather than a full-text
+// warning box that reappears on every calculation.
+function modelAConfidence(country){
+  if(country !== 'pooled'){
+    return {label:'Lower', cls:'low',
+      note:'Country-of-origin refinement applied: compounds a single-cohort-derived factor on top of the general recalibration.'};
+  }
+  return {label:'Moderate', cls:'',
+    note:'Based on two independent South Asian cohort predicted-vs-observed comparisons.'};
+}
+
+function modelBConfidence(nFactors, country){
+  const notes = [];
+  let label = 'Moderate', cls = '';
+  if(nFactors >= CONFIDENCE_FLAG_THRESHOLD){
+    label = 'Low'; cls = 'low';
+    notes.push('Three or more risk factors present; multiplicative combination likely overstates risk.');
+  } else if(country !== 'pooled'){
+    label = 'Lower'; cls = 'low';
+  }
+  if(country !== 'pooled'){
+    notes.push('Country-of-origin refinement applied; adds a single-cohort-derived compounding factor.');
+  }
+  return {label, cls, note: notes.join(' ')};
+}
+
+const INTERSTROKE_SA_OR = {
+  hypertension: {ischemic:3.61, ich:4.37},
+  smoking: {ischemic:1.32, ich:1.35},
+  diabetes: {ischemic:1.16, ich:3.23},
+  high_whr: {ischemic:1.47, ich:2.80}
+};
+const BASELINE_INCIDENCE_PER_100K = {ischemic:39.7, ich:5.0};
+const BASELINE_REFERENCE_AGE = 55;
+const AGE_DOUBLING_DECADE = 10.0;
+
+const VYAS_AGE_BAND_MIDPOINTS = [24,35,45,55,65,75,85];
+const VYAS_IMMIGRANT_HR_BY_AGE = {
+  ischemic: [0.84,0.68,0.69,0.78,0.82,0.74,0.59],
+  ich:      [1.01,1.06,0.98,1.04,1.03,0.86,0.69]
+};
+const VYAS_REF_BAND_INDEX = 3;
+
+function immigrantAgeShape(age, subtype){
+  const xs = VYAS_AGE_BAND_MIDPOINTS, ys = VYAS_IMMIGRANT_HR_BY_AGE[subtype];
+  const refHR = ys[VYAS_REF_BAND_INDEX];
+  let raw;
+  if(age <= xs[0]) raw = ys[0];
+  else if(age >= xs[xs.length-1]) raw = ys[ys.length-1];
+  else{
+    raw = ys[ys.length-1];
+    for(let i=0;i<xs.length-1;i++){
+      if(xs[i] <= age && age <= xs[i+1]){
+        const frac = (age-xs[i])/(xs[i+1]-xs[i]);
+        raw = ys[i] + frac*(ys[i+1]-ys[i]);
+        break;
+      }
+    }
+  }
+  return raw/refHR;
+}
+
+function ageScaleFactor(age, subtype){
+  const decades = (age - BASELINE_REFERENCE_AGE)/AGE_DOUBLING_DECADE;
+  const generic = Math.pow(2, decades);
+  return generic * immigrantAgeShape(age, subtype);
+}
+
+const CONFIDENCE_FLAG_THRESHOLD = 3;
+
+function modelB(age, hypertension, smoker, diabetes, highWhr, country, years){
+  years = years || 10;
+  const factors = {hypertension, smoking:smoker, diabetes, high_whr:highWhr};
+  const nPresent = Object.values(factors).filter(Boolean).length;
+  const out = {};
+  for(const subtype of ["ischemic","ich"]){
+    let rr = 1.0;
+    for(const [factor, present] of Object.entries(factors)){
+      if(present) rr *= INTERSTROKE_SA_OR[factor][subtype];
+    }
+    const annualPer100k = BASELINE_INCIDENCE_PER_100K[subtype] * rr * ageScaleFactor(age, subtype) * COUNTRY_RATIO[country];
+    const annualRate = annualPer100k/100000.0;
+    const cumRisk = (1 - Math.exp(-annualRate*years))*100;
+    out[subtype] = {
+      rr: Math.round(rr*100)/100,
+      risk: cumRisk,
+      lowConfidence: nPresent >= CONFIDENCE_FLAG_THRESHOLD
+    };
+  }
+  return out;
+}
+
+// Formats a raw risk percentage as "X.XX% (~N per 1,000, 10-year horizon)"
+function formatRisk(pct){
+  const decimals = pct < 1 ? 2 : 1;
+  const pctStr = pct.toFixed(decimals) + '%';
+  const per1000 = Math.round(pct * 10);
+  const per1000Display = per1000 < 1 ? '<1' : per1000.toLocaleString();
+  return `${pctStr} <span style="font-weight:400;font-size:13px;color:#5c6b78;">(~${per1000Display} per 1,000, 10-year horizon)</span>`;
+}
+
+function calculate(){
+  const sexEl = document.getElementById('sex');
+  const countryEl = document.getElementById('country');
+  const whrEl = document.getElementById('whr');
+  const ageEl = document.getElementById('age');
+  const totcholEl = document.getElementById('totchol');
+  const hdlEl = document.getElementById('hdl');
+  const sbpEl = document.getElementById('sbp');
+
+  if(!sexEl.value || !countryEl.value || !whrEl.value || !ageEl.value || !totcholEl.value || !hdlEl.value || !sbpEl.value){
+    alert('Please complete all required fields marked with *.');
+    return;
+  }
+
+  const sex = sexEl.value;
+  const age = parseFloat(ageEl.value);
+  const country = countryEl.value;
+  const totchol = parseFloat(totcholEl.value);
+  const hdl = parseFloat(hdlEl.value);
+  const sbp = parseFloat(sbpEl.value);
+  const bpTreated = document.getElementById('bp_treated').checked;
+  const smoker = document.getElementById('smoker').checked;
+  const diabetes = document.getElementById('diabetes').checked;
+  const hypertension = document.getElementById('hypertension').checked;
+  const highWhr = whrEl.value === "1";
+
+  const a = modelA(sex, age, totchol, hdl, sbp, bpTreated, smoker, diabetes, country);
+  const b = modelB(age, hypertension, smoker, diabetes, highWhr, country);
+  // Reference case: identical age/sex/country, none of Model B's four risk factors present
+  const bBaseline = modelB(age, false, false, false, false, country);
+
+  document.getElementById('pceRaw').innerHTML = a.pceRaw + '%';
+  document.getElementById('pceAdj').innerHTML = a.recalibrated + '%';
+  document.getElementById('pceMultLine').textContent =
+    `Recalibration factor: ${a.multiplier.toFixed(2)}× the unadjusted PCE estimate (see methodology below).`;
+
+  const pceCat = ascvdCategory(a.recalibrated);
+  const pceCatBadgeEl = document.getElementById('pceCatBadge');
+  pceCatBadgeEl.textContent = pceCat.label + ' risk';
+  pceCatBadgeEl.className = 'badge ' + pceCat.cls;
+
+  const deltaPts = a.recalibrated - a.pceRaw;
+  const deltaFold = a.pceRaw > 0 ? (a.recalibrated / a.pceRaw) : null;
+  document.getElementById('pceDeltaLine').innerHTML =
+    `Δ vs. standard PCE: <span class="delta-num">+${deltaPts.toFixed(1)} percentage points</span>` +
+    (deltaFold !== null ? ` (${deltaFold.toFixed(1)}× the unadjusted estimate)` : '');
+
+  const pceConf = modelAConfidence(country);
+  const pceConfBadgeEl = document.getElementById('pceConfBadge');
+  pceConfBadgeEl.textContent = 'Confidence: ' + pceConf.label;
+  pceConfBadgeEl.className = 'badge conf ' + pceConf.cls;
+  document.getElementById('pceConf').textContent = pceConf.note;
+
+  document.getElementById('ischRisk').innerHTML = formatRisk(b.ischemic.risk);
+  document.getElementById('ichRisk').innerHTML = formatRisk(b.ich.risk);
+
+  const ischCat = strokeCategory(b.ischemic.risk);
+  const ichCat = strokeCategory(b.ich.risk);
+  const ischCatBadgeEl = document.getElementById('ischCatBadge');
+  ischCatBadgeEl.textContent = ischCat.label;
+  ischCatBadgeEl.className = 'badge ' + ischCat.cls;
+  const ichCatBadgeEl = document.getElementById('ichCatBadge');
+  ichCatBadgeEl.textContent = ichCat.label;
+  ichCatBadgeEl.className = 'badge ' + ichCat.cls;
+
+  function compareLine(result, baselineResult, label){
+    if(result.rr <= 1.01){
+      return `None of the modeled risk factors (hypertension, tobacco use, diabetes, elevated WHR) were selected. This figure reflects the reference 10-year ${label} risk for this age, sex, and origin stratum.`;
+    }
+    return `Relative risk: <strong>${result.rr.toFixed(2)}×</strong> the risk of a South Asian adult of the same age and sex with none of the modeled risk factors present (reference 10-year risk: ${baselineResult.risk.toFixed(2)}%).`;
+  }
+  document.getElementById('ischCompare').innerHTML = compareLine(b.ischemic, bBaseline.ischemic, 'ischemic stroke');
+  document.getElementById('ichCompare').innerHTML = compareLine(b.ich, bBaseline.ich, 'hemorrhagic stroke (ICH)');
+
+  const nFactors = [hypertension, smoker, diabetes, highWhr].filter(Boolean).length;
+  function confBadge(badgeId, noteId){
+    const conf = modelBConfidence(nFactors, country);
+    const badgeEl = document.getElementById(badgeId);
+    badgeEl.textContent = 'Confidence: ' + conf.label;
+    badgeEl.className = 'badge conf ' + conf.cls;
+    document.getElementById(noteId).textContent = conf.note;
+  }
+  confBadge('ischConfBadge', 'ischConf');
+  confBadge('ichConfBadge', 'ichConf');
+
+  document.getElementById('results').style.display = 'block';
+}
+</script>
+</body>
+</html>
